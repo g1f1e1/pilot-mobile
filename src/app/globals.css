@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* ===== هوية Pilot Mobile البصرية ===== */
+@theme {
+  --color-ink: #05110c; /* خلفية شبه سوداء خضراء */
+  --color-ink-2: #081b14;
+  --color-pine: #0f4c39; /* أخضر بايلوت الأساسي */
+  --color-pine-700: #0a3528;
+  --color-pine-300: #1e6b50;
+  --color-gold: #c8a24e;
+  --color-gold-light: #e7cc84;
+  --color-gold-dark: #9a7a33;
+  --color-cream: #f4efe3;
+
+  --font-sans: var(--font-tajawal), system-ui, sans-serif;
+  --font-display: var(--font-messiri), serif;
+
+  --shadow-glow: 0 0 40px -8px rgba(200, 162, 78, 0.45);
+}
+
+/* ===== الأساسيات ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* خلفية متدرّجة فاخرة ثابتة */
+.bg-pilot {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(15, 76, 57, 0.55), transparent 60%),
+    radial-gradient(900px 500px at 0% 20%, rgba(200, 162, 78, 0.1), transparent 55%),
+    radial-gradient(800px 800px at 50% 120%, rgba(15, 76, 57, 0.4), transparent 60%),
+    var(--color-ink);
+}
+
+/* ===== زجاج (Glass Effect) ===== */
+.glass {
+  background: rgba(244, 239, 227, 0.04);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(244, 239, 227, 0.1);
+}
+
+.glass-gold {
+  background: rgba(200, 162, 78, 0.07);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(200, 162, 78, 0.25);
+}
+
+/* ===== نص ذهبي متدرّج ===== */
+.text-gold-gradient {
+  background: linear-gradient(120deg, #e7cc84 0%, #c8a24e 40%, #f5e6b8 60%, #9a7a33 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gold-shimmer {
+  animation: shimmer 5s linear infinite;
+}
+
+/* إطار ذهبي متوهّج */
+.gold-ring {
+  box-shadow:
+    0 0 0 1px rgba(200, 162, 78, 0.5),
+    0 0 25px -5px rgba(200, 162, 78, 0.5),
+    inset 0 0 20px -10px rgba(200, 162, 78, 0.4);
+}
+
+/* ===== حركات (Animations) ===== */
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float-y {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+.animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+.animate-glow {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 30s linear infinite;
+}
+
+/* ===== شريط التمرير ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-2);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--color-gold-dark), var(--color-pine));
+  border-radius: 10px;
+}
+
+/* تحديد النص */
+::selection {
+  background: rgba(200, 162, 78, 0.3);
+  color: #fff;
+}
+
+/* إخفاء أسهم input number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
