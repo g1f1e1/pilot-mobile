@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 import { guardAdmin } from "@/lib/adminGuard";
 
 const ALLOWED: Record<string, string> = {
@@ -11,6 +9,8 @@ const ALLOWED: Record<string, string> = {
   "image/gif": "gif",
 };
 
+// نخزّن الصورة كـ data URL (base64) داخل قاعدة البيانات.
+// هذا يجعل الموقع يعمل على الإنترنت (Vercel) دون الحاجة لتخزين ملفات على الخادم.
 export async function POST(request: Request) {
   const denied = await guardAdmin();
   if (denied) return denied;
@@ -29,17 +29,16 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (file.size > 4 * 1024 * 1024) {
-      return NextResponse.json({ ok: false, error: "حجم الصورة أكبر من 4 ميجابايت." }, { status: 400 });
+    // حدّ 2 ميجا لإبقاء الصفحة سريعة (الصورة تُحفظ داخل قاعدة البيانات).
+    if (file.size > 2 * 1024 * 1024) {
+      return NextResponse.json({ ok: false, error: "حجم الصورة أكبر من 2 ميجابايت. استخدم صورة أصغر." }, { status: 400 });
     }
 
     const bytes = Buffer.from(await file.arrayBuffer());
-    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const dir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(dir, { recursive: true });
-    await writeFile(path.join(dir, name), bytes);
+    const base64 = bytes.toString("base64");
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    return NextResponse.json({ ok: true, url: `/uploads/${name}` });
+    return NextResponse.json({ ok: true, url: dataUrl });
   } catch (err) {
     console.error("UPLOAD error:", err);
     return NextResponse.json({ ok: false, error: "تعذّر رفع الصورة." }, { status: 500 });

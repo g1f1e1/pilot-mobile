@@ -69,7 +69,7 @@ export function ImageUploader({
           </button>
         )}
         {err && <p className="text-xs text-red-300">{err}</p>}
-        <p className="text-xs text-cream/40">PNG / JPG / WEBP / SVG — حتى 4 ميجا.</p>
+        <p className="text-xs text-cream/40">PNG / JPG / WEBP / SVG — حتى 2 ميجا.</p>
       </div>
     </div>
   );

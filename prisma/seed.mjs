@@ -1,4 +1,5 @@
 // زرع البيانات الأولية لـ Pilot Mobile
+// آمن للتشغيل المتكرر (idempotent): لا يحذف أي تخصيصات عند إعادة النشر.
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -31,17 +32,20 @@ function generateInvoiceCodes(count) {
 async function main() {
   console.log("🌱 بدء زرع البيانات...");
 
-  // 1) الجوائز
-  await prisma.prize.deleteMany();
-  for (const p of PRIZES) {
-    await prisma.prize.create({ data: p });
+  // 1) الجوائز — تُنشأ فقط إذا لم تكن موجودة (حتى لا تُمحى تعديلات الإدارة)
+  const prizeCount = await prisma.prize.count();
+  if (prizeCount === 0) {
+    for (const p of PRIZES) {
+      await prisma.prize.create({ data: p });
+    }
+    console.log(`✅ تم إنشاء ${PRIZES.length} جوائز`);
+  } else {
+    console.log(`ℹ️  يوجد ${prizeCount} جائزة مسبقًا — تم التخطي`);
   }
-  console.log(`✅ تم إنشاء ${PRIZES.length} جوائز`);
 
   // 2) أكواد فواتير تجريبية (إن لم تكن موجودة)
   const existing = await prisma.invoice.count();
   if (existing === 0) {
-    // أكواد ثابتة معروفة للتجربة
     const fixed = ["PLT-84931", "PLT-12491", "PLT-59322", "PLT-10001", "PLT-20002"];
     const random = generateInvoiceCodes(45);
     const all = [...new Set([...fixed, ...random])];
@@ -52,16 +56,24 @@ async function main() {
     console.log(`ℹ️  يوجد ${existing} فاتورة مسبقًا — تم التخطي`);
   }
 
-  // 3) حساب الأدمن
+  // 3) حساب الأدمن (upsert آمن)
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "pilot2026";
   const hash = await bcrypt.hash(password, 10);
   await prisma.adminUser.upsert({
     where: { username },
-    update: { password: hash },
+    update: {},
     create: { username, password: hash },
   });
-  console.log(`✅ حساب الأدمن جاهز — المستخدم: ${username} / كلمة المرور: ${password}`);
+  console.log(`✅ حساب الأدمن جاهز — المستخدم: ${username}`);
+
+  // 4) صف الإعدادات (id=1) — يُنشأ إن لم يوجد
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1 },
+  });
+  console.log("✅ إعدادات الموقع جاهزة");
 
   console.log("🎉 اكتمل زرع البيانات.");
 }

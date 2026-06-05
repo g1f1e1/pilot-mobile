@@ -1,13 +1,13 @@
 // Pilot Mobile — Prisma schema
-// قاعدة البيانات: SQLite للتطوير المحلي (سهل التحويل إلى PostgreSQL لاحقًا
-// بتغيير provider إلى "postgresql" وتحديث DATABASE_URL فقط).
+// قاعدة البيانات: PostgreSQL (سحابية، تعمل على الإنترنت عبر Vercel/Neon).
+// DATABASE_URL يُضبط من إعدادات Vercel (أو ملف .env محليًا).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
